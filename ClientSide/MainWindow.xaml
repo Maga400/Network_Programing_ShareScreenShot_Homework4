@@ -11,6 +11,7 @@
         <Button Content="ConnectToServer" Margin="50 0 0 10" HorizontalAlignment="Left" Height="60" Width="150" VerticalAlignment="Bottom" Click="ConnectToServer" />
         <Button Content="SendToScreenShot"  Margin="10" HorizontalAlignment="Center" Height="60" Width="150" VerticalAlignment="Bottom" Click="SendToScreenshot" />
         <Button Content="ShowScreenshot"  Margin="0 0 50 10" HorizontalAlignment="Right" Height="60" Width="150" VerticalAlignment="Bottom" Click="ShowScreen" />
+        <!--<Button Content="GetStart" Height="10" Width="10"/>-->
 
     </Grid>
 </Window>

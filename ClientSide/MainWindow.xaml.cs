@@ -113,24 +113,28 @@ public partial class MainWindow : Window
     }
 
 
-    private void ConnectToServer(object sender, RoutedEventArgs e)
+    private async void ConnectToServer(object sender, RoutedEventArgs e)
     {
         var buffer = new byte[ushort.MaxValue - 29];
-        client.SendAsync(buffer, buffer.Length, remoteEP);
+        await client.SendAsync(buffer, buffer.Length, remoteEP);
 
 
     }
 
     private async void SendToScreenshot(object sender, RoutedEventArgs e)
     {
+        while (true)
+        {
+            await Task.Delay(1);
 
-        var screen = await TakeScreenShotAsync();
-        var imageBytes = await ImageToByteAsync(screen);
+            var screen = await TakeScreenShotAsync();
+            var imageBytes = await ImageToByteAsync(screen);
 
-        var chunks = imageBytes.Chunk(ushort.MaxValue - 29);
+            var chunks = imageBytes.Chunk(ushort.MaxValue - 29);
 
-        foreach (var chunk in chunks)
-            await client.SendAsync(chunk, chunk.Length, remoteEP);
+            foreach (var chunk in chunks)
+                await client.SendAsync(chunk, chunk.Length, remoteEP);
+        }
 
 
     }

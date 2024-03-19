@@ -17,66 +17,68 @@ var listener = new UdpClient(listenerEP);
 // --------------------------------------------------------------------------------------
 
 List<UdpClient> Clients = new List<UdpClient>();
+bool check = false;
+Console.WriteLine("Nece dene client qosulandan sonra screen shot prosesinin baslamasin isteyirsiniz?:");
+int countt = Convert.ToInt32(Console.ReadLine());
+
 
 while (true)
 {
-
     var resultt = await listener.ReceiveAsync();
-    Console.WriteLine($"{resultt.RemoteEndPoint} Connected...");
 
     if (Database.RemoteEPS.Contains(resultt.RemoteEndPoint) == false)
     {
 
+        Console.WriteLine($"{resultt.RemoteEndPoint} Connected...");
         Database.RemoteEPS.Add(resultt.RemoteEndPoint);
     }
 
-    Console.WriteLine(Database.RemoteEPS.Count);
-
-
-    while (true)
+    if (Database.RemoteEPS.Count >= countt)
     {
-
-        var buffer = new byte[ushort.MaxValue - 29];
-        var list = new List<byte>();
-        var maxLen = buffer.Length;
-        var len = 0;
-
-        do
+        while (true)
         {
-            try
-            {
-                var result = await listener.ReceiveAsync();
 
-                buffer = result.Buffer;
-                len = buffer.Length;
-                list.AddRange(buffer);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+            var buffer = new byte[ushort.MaxValue - 29];
+            var list = new List<byte>();
+            var maxLen = buffer.Length;
+            var len = 0;
 
-        } while (len == maxLen);
-
-        if (Database.RemoteEPS.Count > 0)
-        {
-            foreach (var item in Database.RemoteEPS)
+            do
             {
-                //Console.WriteLine(item.ToString());
-                var chunks = list.ToArray().Chunk(maxLen);
-                foreach (var chunk in chunks)
+                try
                 {
-                    await listener.SendAsync(chunk, chunk.Length, item);
+                    var result = await listener.ReceiveAsync();
+
+                    buffer = result.Buffer;
+                    len = buffer.Length;
+                    list.AddRange(buffer);
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+
+            } while (len == maxLen);
+
+            if (Database.RemoteEPS.Count > 0)
+            {
+                foreach (var item in Database.RemoteEPS)
+                {
+                    //Console.WriteLine(item.ToString());
+                    var chunks = list.ToArray().Chunk(maxLen);
+                    foreach (var chunk in chunks)
+                    {
+                        await listener.SendAsync(chunk, chunk.Length, item);
+                    }
+                }
+                list.Clear();
+
             }
-            list.Clear();
 
         }
-
     }
-
-
 }
+
 
 public static class Database
 {
